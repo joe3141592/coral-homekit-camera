@@ -5,7 +5,7 @@ The project builds on [HAP-python](https://github.com/ikalchev/HAP-python) and c
 - A Web-GUI to train the camera. 
 - A backend service to interact with HomeKit.
 
-![homekit](/documentation/homekit_detection.gif)
+<img src="./documentation/gui.png" alt="drawing" width="400"/>
 
 # Installation 
 todo
