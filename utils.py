@@ -13,8 +13,13 @@ import picamera
 import io
 
 
-def retrain(model='./models/mobilenet_v1_1.0_224_quant_embedding_extractor_edgetpu.tflite', out_file='./models/classify.tflite' , map_file='./models/map.json'):
+def get_labels():
+    labels = json.loads(open("./models/map.json").read())
+    labels = dict((v,k) for k,v in labels.items())
+    return labels
 
+
+def retrain(model='./models/mobilenet_v1_1.0_224_quant_embedding_extractor_edgetpu.tflite', out_file='./models/classify.tflite' , map_file='./models/map.json'):
     train_dict = defaultdict(lambda: [])
     pics = TinyDB("./pics.json")
     samples = pics.all()
@@ -57,6 +62,11 @@ class StateManager(object):
         self.last_state = "retrain"
         self.zmq_socket.send_json(work_message)
 
+    def shutdown(self):
+        work_message = {"state": "shutdown"}
+        self.last_state = "shutdown"
+        self.zmq_socket.send_json(work_message)
+
     def run(self):
         work_message = {"state": "run"}
         self.last_state = "run"
@@ -72,11 +82,13 @@ class ApplicationState(threading.Thread):
         self.consumer_receiver = self.context.socket(zmq.PULL)
         self.consumer_receiver.connect("tcp://127.0.0.1:5557")
         self.last_state = "run"
-
+        self.is_running = True
     def run(self):
-        while True:
+        while self.is_running:
             message = self.consumer_receiver.recv_json()
             self.last_state = message["state"]
+            if self.last_state == "shutdown":
+                self.is_running = False
 
 
 class Camera(object):

@@ -4,4 +4,4 @@ print("starting flask...")
 
 #os.remove("./pics.json")
 
-app.run(host="192.168.178.89", threaded=False)
+app.run(host="0.0.0.0", threaded=False)

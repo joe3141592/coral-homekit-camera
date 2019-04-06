@@ -1,34 +1,18 @@
 import logging
-import signal
 
 from pyhap.accessory import Accessory
 from pyhap.accessory_driver import AccessoryDriver
 from pyhap.const import CATEGORY_SENSOR
 from edgetpu.classification.engine import ClassificationEngine
 import io
-import json
-import threading
-from utils import retrain
-
-import zmq
-
-
-from utils import Camera, ApplicationState
+from utils import retrain, get_labels,Camera, ApplicationState
+import signal
+import os
 
 camera = Camera()
 stream = io.BytesIO()
 app_state = ApplicationState()
 app_state.start()
-
-
-def get_labels():
-    labels = json.loads(open("./models/map.json").read())
-    labels = dict((v,k) for k,v in labels.items())
-    return labels
-
-
-# Imprint the weights
-
 
 
 class MotionSensor(Accessory):
@@ -40,11 +24,18 @@ class MotionSensor(Accessory):
         serv_motion = self.add_preload_service('MotionSensor')
         self.char_detected = serv_motion.configure_char('MotionDetected')
         self.engine = ClassificationEngine("./models/classify.tflite")
-        self.labels = get_labels()
         self.is_trained = retrain()
+        self.labels = get_labels()
+        self.is_running = True
+        logging.info(self.setup_message())
 
     def run(self):
-        while True:
+        while self.is_running:
+
+            if app_state.last_state == "shutdown":
+                self.is_running = False
+                os.system('kill $PPID')
+
             if (app_state.last_state == "run") and self.is_trained:
                 detection=False
                 img = camera.returnPIL()
@@ -80,10 +71,12 @@ class MotionSensor(Accessory):
         self.char_detected.set_value(val)
 
     def stop(self):
+        logging.info("shut down")
         super().stop()
 
 
 logging.basicConfig(level=logging.INFO, format="[%(module)s] %(message)s")
+
 
 
 def get_accessory(driver):
@@ -101,4 +94,5 @@ driver.add_accessory(accessory=get_accessory(driver))
 signal.signal(signal.SIGTERM, driver.signal_handler)
 
 # Start it!
+
 driver.start()

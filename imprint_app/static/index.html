@@ -31,6 +31,9 @@
   <button id="add_detection"  class="btn btn-danger">add detection</button>
   <button id="imprint_weights"  class="btn btn-dark">imprint weights</button>
 
+  <a href="/shutdown" class="btn btn-sm">shutdown</a>
+
+
   <div id = "photo_div" class="card-columns"></div>
   <div id = "class_div" > </div>
   
@@ -134,12 +137,12 @@ $("#add_background").click(function() {
         dataType: 'json',
         data: {"class":"background"},
         success: function(data) {
-          get_samples();
                  }
 
     });
 
-    get_samples();
+    setTimeout(get_samples,1000);
+
 
 });
 
@@ -159,7 +162,7 @@ $("#add_detection").click(function() {
 
 
     });
-    get_samples();
+    setTimeout(get_samples,1000);
 
 
 })

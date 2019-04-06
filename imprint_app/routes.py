@@ -10,6 +10,14 @@ state_manager = None
 q = Query()
 
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    state_manager.shutdown()
+
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
 @app.before_first_request
 def test():
     global state_manager
@@ -65,6 +73,11 @@ def get_pic(cid):
     if request.method == "DELETE":
         pics.remove(where('img') == cid)
         return "deleted"
+
+@app.route('/shutdown', methods=['GET'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down...'
 
 
 @app.route('/')
