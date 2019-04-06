@@ -1,9 +1,11 @@
-#Coral smart camera for Apple HomeKit
+# Coral smart camera for Apple HomeKit
 This project shows how to build a [Coral Edge TPU](https://coral.withgoogle.com/) trainable smart camera and integrate it into Apple HomeKit.
 The project builds on [HAP-python](https://github.com/ikalchev/HAP-python) and consists of two main components: 
 
 - A Web-GUI to train the camera. 
 - A backend service to interact with HomeKit.
+
+![homekit](/documentation/homekit_detection.gif)
 
 # Installation 
 todo
@@ -24,6 +26,6 @@ To start the application you need to run both `run.py` and `hap.py`.
 Access the application at `yourhost:5000/`. 
 You can imprint new weights using the two buttons `add_background` and `add_detection`. Pressing on `imprint_weights` will update the classification model.
 
-![a](./documentation/gui.png)
+![gui](./documentation/gui.png)
 
 
