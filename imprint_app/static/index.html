@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>coral smart sensor</title>
+  </head>
+  <body>
+
+    <!-- As a link -->
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#">coral smart sensor</a>
+  </nav>
+
+
+
+  <div class="container-fluid">
+    
+
+
+
+    
+ <br/>
+
+  <button id="add_background"  class="btn btn-primary">add background</button>
+  <button id="add_detection"  class="btn btn-danger">add detection</button>
+  <button id="imprint_weights"  class="btn btn-dark">imprint weights</button>
+
+  <div id = "photo_div" class="card-columns"></div>
+  <div id = "class_div" > </div>
+  
+
+  <div id="template" style="visibility: hidden">
+  <div id="template_2" class="card">
+      <img class="card-img-top" src="/static/index.jpeg" alt="Card image cap">
+
+    <div class="card-body">
+        <p class="card-text"> <a href="#" class="btn btn-outline-primary" onclick="del(this)">Delete</a></p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
+    <script
+			  src="https://code.jquery.com/jquery-3.3.1.min.js"
+			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			  crossorigin="anonymous"></script>
+    
+
+       
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+
+  
+  </body>
+
+
+  <script>
+  
+
+
+
+
+function get_samples() {
+  $("#photo_div").html("");
+console.log("retrieving pics");
+
+$.ajax({
+        url: '/samples/',
+        type: 'get',
+        dataType: 'json',
+        data: $('#classform').serialize(),
+        success: function(data) {
+          $.each(data.ids, function(index, value) {
+            console.log(value);
+            $("#template .card-img-top").attr("src","/samples/"+String(value["id"]));
+            t = $("#template_2").clone().attr("id", value["id"]);
+            if (value["class"] == "detection") {
+              t.find("a").attr("class", "btn btn-outline-danger");
+            };
+
+            $("#photo_div").append(t);
+          });
+          
+          }
+});
+}
+
+
+function del (x) {
+  var sample_id = $(x).parent().parent().parent().attr("id");
+  console.log(sample_id);
+  $.ajax({
+        url: '/samples/' + sample_id,
+        type: 'delete',
+        success: function(data) {
+                 }
+
+
+    });
+    get_samples();
+
+}
+
+$( document ).ready(function() {
+    get_samples();
+
+   
+
+
+
+
+
+$("#add_background").click(function() {
+  console.log("hijacked");
+
+  $.ajax({
+        url: '/samples/',
+        type: 'post',
+        dataType: 'json',
+        data: {"class":"background"},
+        success: function(data) {
+          get_samples();
+                 }
+
+    });
+
+    get_samples();
+
+});
+
+
+
+$("#add_detection").click(function() {
+  console.log("hijacked");
+
+  $.ajax({
+        url: '/samples/',
+        type: 'post',
+        dataType: 'json',
+        data: {"class":"detection"},
+        success: function(data) {
+          console.log("done");
+                 }
+
+
+    });
+    get_samples();
+
+
+})
+
+$("#imprint_weights").click(function() {
+  console.log("hijacked");
+
+  $.ajax({
+        url: '/state/',
+        type: 'post',
+        dataType: 'json',
+        data: {"state":"retrain"},
+        success: function(data) {
+          console.log("done");
+                 }
+
+
+    });
+
+
+})
+
+
+});
+
+  
+  </script>
+</html>
