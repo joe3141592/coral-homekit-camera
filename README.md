@@ -1,4 +1,7 @@
 # Coral smart camera for Apple HomeKit
+
+**Read more on this project [here](https://medium.com/@johannes.sc/weight-imprinting-on-coral-edge-tpu-4637c1ca02b8)!**
+
 This project shows how to build a [Coral Edge TPU](https://coral.withgoogle.com/) trainable smart camera and integrate it into Apple HomeKit.
 The project builds on [HAP-python](https://github.com/ikalchev/HAP-python) and consists of two main components: 
 
